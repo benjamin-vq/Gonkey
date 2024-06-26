@@ -38,20 +38,32 @@ func (tt TokenType) Literal() (lit string) {
 	case 5:
 		lit = "+"
 	case 6:
-		lit = ","
+		lit = "-"
 	case 7:
-		lit = ";"
+		lit = "!"
 	case 8:
-		lit = "("
+		lit = "*"
 	case 9:
-		lit = ")"
+		lit = "/"
 	case 10:
-		lit = "{"
+		lit = "<"
 	case 11:
-		lit = "}"
+		lit = ">"
 	case 12:
-		lit = "FUNCTION"
+		lit = ","
 	case 13:
+		lit = ";"
+	case 14:
+		lit = "("
+	case 15:
+		lit = ")"
+	case 16:
+		lit = "{"
+	case 17:
+		lit = "}"
+	case 18:
+		lit = "FUNCTION"
+	case 19:
 		lit = "LET"
 	}
 
@@ -67,6 +79,13 @@ const (
 
 	ASSIGN
 	PLUS
+	MINUS
+	BANG
+	ASTERISK
+	SLASH
+
+	LT
+	GT
 
 	COMMA
 	SEMICOLON

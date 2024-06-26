@@ -26,24 +26,37 @@ func (l *Lexer) NextToken() (tok token.Token) {
 	l.skipWhitespace()
 
 	switch l.char {
+	// ASCII
 	case 0:
-		tok = token.Token{token.EOF, token.EOF.Literal()}
+		tok = newToken(token.EOF)
+	case 33:
+		tok = newToken(token.BANG)
 	case 40:
-		tok = token.Token{token.LPAREN, token.LPAREN.Literal()}
+		tok = newToken(token.LPAREN)
 	case 41:
-		tok = token.Token{token.RPAREN, token.RPAREN.Literal()}
+		tok = newToken(token.RPAREN)
+	case 42:
+		tok = newToken(token.ASTERISK)
 	case 43:
-		tok = token.Token{token.PLUS, token.PLUS.Literal()}
+		tok = newToken(token.PLUS)
 	case 44:
-		tok = token.Token{token.COMMA, token.COMMA.Literal()}
+		tok = newToken(token.COMMA)
+	case 45:
+		tok = newToken(token.MINUS)
+	case 47:
+		tok = newToken(token.SLASH)
 	case 59:
-		tok = token.Token{token.SEMICOLON, token.SEMICOLON.Literal()}
+		tok = newToken(token.SEMICOLON)
+	case 60:
+		tok = newToken(token.LT)
 	case 61:
-		tok = token.Token{token.ASSIGN, token.ASSIGN.Literal()}
+		tok = newToken(token.ASSIGN)
+	case 62:
+		tok = newToken(token.GT)
 	case 123:
-		tok = token.Token{token.LBRACE, token.LBRACE.Literal()}
+		tok = newToken(token.LBRACE)
 	case 125:
-		tok = token.Token{token.RBRACE, token.RBRACE.Literal()}
+		tok = newToken(token.RBRACE)
 	default:
 		if isLetter(l.char) {
 			tok.Literal = l.readIdentifier()
@@ -54,8 +67,7 @@ func (l *Lexer) NextToken() (tok token.Token) {
 			tok.Type = token.INT
 			return tok
 		} else {
-			tok = token.Token{token.ILLEGAL, token.ILLEGAL.Literal()}
-
+			tok = newToken(token.ILLEGAL)
 		}
 	}
 
@@ -65,7 +77,7 @@ func (l *Lexer) NextToken() (tok token.Token) {
 
 // Read until we encounter a non-letter character, return the read chunk
 // let myNumber = 5;
-// ^~~ ^~~~~~~~
+// ^~~
 func (l *Lexer) readIdentifier() string {
 	position := l.position
 	for isLetter(l.char) {
