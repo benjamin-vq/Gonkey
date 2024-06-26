@@ -8,8 +8,13 @@ type Token struct {
 }
 
 var KEYWORDS = map[string]TokenType{
-	"fn":  FUNCTION,
-	"let": LET,
+	"fn":     FUNCTION,
+	"let":    LET,
+	"true":   TRUE,
+	"false":  FALSE,
+	"if":     IF,
+	"else":   ELSE,
+	"return": RETURN,
 }
 
 // LookupIdent Figure out if the received identifier is a keyword or not
@@ -65,6 +70,16 @@ func (tt TokenType) Literal() (lit string) {
 		lit = "FUNCTION"
 	case 19:
 		lit = "LET"
+	case 20:
+		lit = "TRUE"
+	case 21:
+		lit = "FALSE"
+	case 22:
+		lit = "IF"
+	case 23:
+		lit = "ELSE"
+	case 24:
+		lit = "RETURN"
 	}
 
 	return lit
@@ -94,6 +109,13 @@ const (
 	RPAREN
 	LBRACE
 	RBRACE
+
+	// Keywords
 	FUNCTION
 	LET
+	TRUE
+	FALSE
+	IF
+	ELSE
+	RETURN
 )
