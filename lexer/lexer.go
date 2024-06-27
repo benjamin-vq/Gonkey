@@ -30,7 +30,12 @@ func (l *Lexer) NextToken() (tok token.Token) {
 	case 0:
 		tok = newToken(token.EOF)
 	case 33:
-		tok = newToken(token.BANG)
+		if l.peekChar() == '=' {
+			tok = newToken(token.NOT_EQ)
+			l.readChar()
+		} else {
+			tok = newToken(token.BANG)
+		}
 	case 40:
 		tok = newToken(token.LPAREN)
 	case 41:
@@ -50,7 +55,12 @@ func (l *Lexer) NextToken() (tok token.Token) {
 	case 60:
 		tok = newToken(token.LT)
 	case 61:
-		tok = newToken(token.ASSIGN)
+		if l.peekChar() == '=' {
+			tok = newToken(token.EQ)
+			l.readChar()
+		} else {
+			tok = newToken(token.ASSIGN)
+		}
 	case 62:
 		tok = newToken(token.GT)
 	case 123:
@@ -88,9 +98,8 @@ func (l *Lexer) readIdentifier() string {
 }
 
 // Read until we encounter a non-digit character, return the read number
-// let another = 123456;
-//
-//	^~~~~~
+// 5432 != 2345
+// ^~~~
 func (l *Lexer) readNumber() string {
 	position := l.position
 	for isDigit(l.char) {
@@ -118,6 +127,14 @@ func (l *Lexer) skipWhitespace() (tok token.Token) {
 	}
 
 	return tok
+}
+
+func (l *Lexer) peekChar() byte {
+	if l.readPosition > len(l.input) {
+		return 0
+	}
+
+	return l.input[l.readPosition]
 }
 
 func (l *Lexer) readChar() {

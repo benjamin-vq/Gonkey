@@ -67,21 +67,24 @@ func (tt TokenType) Literal() (lit string) {
 	case 17:
 		lit = "}"
 	case 18:
-		lit = "FUNCTION"
+		lit = "=="
 	case 19:
-		lit = "LET"
+		lit = "!="
 	case 20:
-		lit = "TRUE"
+		lit = "FUNCTION"
 	case 21:
-		lit = "FALSE"
+		lit = "LET"
 	case 22:
-		lit = "IF"
+		lit = "TRUE"
 	case 23:
-		lit = "ELSE"
+		lit = "FALSE"
 	case 24:
+		lit = "IF"
+	case 25:
+		lit = "ELSE"
+	case 26:
 		lit = "RETURN"
 	}
-
 	return lit
 }
 
@@ -109,6 +112,9 @@ const (
 	RPAREN
 	LBRACE
 	RBRACE
+
+	EQ
+	NOT_EQ
 
 	// Keywords
 	FUNCTION

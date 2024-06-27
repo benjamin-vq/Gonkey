@@ -22,6 +22,9 @@ if (5 < 10) {
 } else {
 	return false;
 }
+
+10 == 10;
+10 != 9;
 `
 
 	cases := []struct {
@@ -93,6 +96,16 @@ if (5 < 10) {
 		{expectedType: token.FALSE, expectedLiteral: "false"},
 		{expectedType: token.SEMICOLON, expectedLiteral: ";"},
 		{expectedType: token.RBRACE, expectedLiteral: "}"},
+
+		{expectedType: token.INT, expectedLiteral: "10"},
+		{expectedType: token.EQ, expectedLiteral: "=="},
+		{expectedType: token.INT, expectedLiteral: "10"},
+		{expectedType: token.SEMICOLON, expectedLiteral: ";"},
+		{expectedType: token.INT, expectedLiteral: "10"},
+		{expectedType: token.NOT_EQ, expectedLiteral: "!="},
+		{expectedType: token.INT, expectedLiteral: "9"},
+		{expectedType: token.SEMICOLON, expectedLiteral: ";"},
+
 		{expectedType: token.EOF, expectedLiteral: ""},
 	}
 
