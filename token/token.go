@@ -27,6 +27,10 @@ func LookupIdent(ident string) TokenType {
 	return IDENT
 }
 
+func (tt TokenType) String() string {
+	return tt.Literal()
+}
+
 func (tt TokenType) Literal() (lit string) {
 
 	switch tt {
