@@ -130,7 +130,7 @@ func (l *Lexer) skipWhitespace() (tok token.Token) {
 }
 
 func (l *Lexer) peekChar() byte {
-	if l.readPosition > len(l.input) {
+	if l.readPosition >= len(l.input) {
 		return 0
 	}
 
