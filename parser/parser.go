@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"fmt"
 	"github.com/benja-vq/gonkey/ast"
 	"github.com/benja-vq/gonkey/lexer"
 	"github.com/benja-vq/gonkey/token"
@@ -12,12 +13,14 @@ type Parser struct {
 
 	currToken token.Token
 	peekToken token.Token
+	errors    []string
 }
 
 func NewParser(l *lexer.Lexer) *Parser {
 
 	parser := Parser{
-		l: l,
+		l:      l,
+		errors: []string{},
 	}
 
 	// Initialize currToken and peekToken
@@ -25,6 +28,16 @@ func NewParser(l *lexer.Lexer) *Parser {
 	parser.nextToken()
 
 	return &parser
+}
+
+func (p *Parser) Errors() []string {
+	return p.errors
+}
+
+func (p *Parser) peekError(tt token.TokenType) {
+	msg := fmt.Sprintf("Peeking returned an incorrect token, got %s want %s",
+		p.peekToken.Type, tt)
+	p.errors = append(p.errors, msg)
 }
 
 func (p *Parser) nextToken() {
@@ -36,7 +49,7 @@ func (p *Parser) ParseProgram() *ast.Program {
 	program := &ast.Program{}
 	program.Statements = []ast.Statement{}
 
-	for p.currToken.Type != token.EOF {
+	for !p.currTokenIs(token.EOF) {
 		stmt := p.parseStatement()
 		if stmt != nil {
 			program.Statements = append(program.Statements, stmt)
@@ -97,5 +110,6 @@ func (p *Parser) expectPeek(tt token.TokenType) bool {
 		return true
 	}
 
+	p.peekError(tt)
 	return false
 }

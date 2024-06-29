@@ -19,6 +19,7 @@ let foobar = 272727;
 	if program == nil {
 		t.Fatalf("Parsed program was nil")
 	}
+	checkParserErrors(t, p)
 
 	if len(program.Statements) != 3 {
 		t.Errorf("Incorrect amount of program statements, got %d want 3",
@@ -55,4 +56,17 @@ let foobar = 272727;
 			t.Errorf("Incorrect token literal, got %s want %s", let.Name.TokenLiteral(), c.expectedIdentifier)
 		}
 	}
+}
+
+func checkParserErrors(t *testing.T, p *Parser) {
+	errors := p.Errors()
+	if len(errors) != 0 {
+		t.Errorf("Parser has %d errors", len(errors))
+		for _, msg := range errors {
+			t.Errorf("Parser error: %q", msg)
+		}
+		t.FailNow()
+	}
+
+	return
 }
