@@ -58,6 +58,39 @@ let foobar = 272727;
 	}
 }
 
+func TestReturnStatements(t *testing.T) {
+	input := `
+return -1;
+return 5;
+return 10;
+return 993327;
+`
+	l := lexer.NewLexer(input)
+	p := NewParser(l)
+
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+
+	if len(program.Statements) != 4 {
+		t.Fatalf("Incorrect amount of statements, got %d want 4",
+			len(program.Statements))
+	}
+
+	for _, stmt := range program.Statements {
+		returnStmt, ok := stmt.(*ast.ReturnStatement)
+
+		if !ok {
+			t.Errorf("Statement is not a return statement, got %T", stmt)
+			continue
+		}
+
+		if returnStmt.TokenLiteral() != "return" {
+			t.Errorf("Incorrect token literal, got %s want 'return'",
+				returnStmt.TokenLiteral())
+		}
+	}
+}
+
 func checkParserErrors(t *testing.T, p *Parser) {
 	errors := p.Errors()
 	if len(errors) != 0 {
