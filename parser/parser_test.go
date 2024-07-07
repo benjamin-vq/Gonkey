@@ -265,16 +265,19 @@ func TestOperatorPrecedenceParsing(t *testing.T) {
 		{"3 + 4 * 5 == 3 * 1 + 4 * 5", "((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))"},
 	}
 
-	for _, c := range cases {
-		l := lexer.NewLexer(c.input)
-		p := NewParser(l)
-		program := p.ParseProgram()
-		checkParserErrors(t, p)
+	for i, c := range cases {
+		t.Run(fmt.Sprintf("Operator Precedence Test Case %d", i), func(t *testing.T) {
 
-		actual := program.String()
-		if actual != c.expected {
-			t.Errorf("Incorrect program, got %q want %q", actual, c.expected)
-		}
+			l := lexer.NewLexer(c.input)
+			p := NewParser(l)
+			program := p.ParseProgram()
+			checkParserErrors(t, p)
+
+			actual := program.String()
+			if actual != c.expected {
+				t.Errorf("Incorrect program, got %q want %q", actual, c.expected)
+			}
+		})
 	}
 }
 
