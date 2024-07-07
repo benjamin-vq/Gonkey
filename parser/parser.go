@@ -3,6 +3,7 @@ package parser
 import (
 	"fmt"
 	"github.com/benja-vq/gonkey/ast"
+	"github.com/benja-vq/gonkey/config"
 	"github.com/benja-vq/gonkey/lexer"
 	"github.com/benja-vq/gonkey/token"
 	"log"
@@ -54,11 +55,13 @@ func NewParser(l *lexer.Lexer) *Parser {
 		errors: []string{},
 	}
 
-	parser.prefixParseFns = make(map[token.TokenType]prefixParseFn, 4)
+	parser.prefixParseFns = make(map[token.TokenType]prefixParseFn, 6)
 	parser.registerPrefix(token.IDENT, parser.parseIdentifier)
 	parser.registerPrefix(token.INT, parser.parseIntegerLiteral)
 	parser.registerPrefix(token.BANG, parser.parsePrefixExpression)
 	parser.registerPrefix(token.MINUS, parser.parsePrefixExpression)
+	parser.registerPrefix(token.TRUE, parser.parseBoolean)
+	parser.registerPrefix(token.FALSE, parser.parseBoolean)
 
 	parser.infixParseFns = make(map[token.TokenType]infixParseFn, 8)
 	parser.registerInfix(token.PLUS, parser.parseInfixExpression)
@@ -162,7 +165,9 @@ func (p *Parser) parseReturnStatement() ast.Statement {
 }
 
 func (p *Parser) parseExpressionStatement() *ast.ExpressionStatement {
-	defer untrace(trace("parseExpressionStatement"))
+	if config.Debug != nil && *config.Debug {
+		defer untrace(trace("parseExpressionStatement"))
+	}
 	stmt := &ast.ExpressionStatement{Token: p.currToken}
 
 	stmt.Expression = p.parseExpression(LOWEST)
@@ -175,7 +180,9 @@ func (p *Parser) parseExpressionStatement() *ast.ExpressionStatement {
 }
 
 func (p *Parser) parseExpression(precedence int) ast.Expression {
-	defer untrace(trace("parseExpression"))
+	if config.Debug != nil && *config.Debug {
+		defer untrace(trace("parseExpression"))
+	}
 	prefix := p.prefixParseFns[p.currToken.Type]
 	if prefix == nil {
 		p.noPrefixParseFnError(p.currToken.Type)
@@ -201,7 +208,9 @@ func (p *Parser) parseIdentifier() ast.Expression {
 }
 
 func (p *Parser) parseIntegerLiteral() ast.Expression {
-	defer untrace(trace("parseIntegerLiteral"))
+	if config.Debug != nil && *config.Debug {
+		defer untrace(trace("parseIntegerLiteral"))
+	}
 	lit := &ast.IntegerLiteral{Token: p.currToken}
 
 	value, err := strconv.ParseInt(p.currToken.Literal, 0, 64)
@@ -217,7 +226,9 @@ func (p *Parser) parseIntegerLiteral() ast.Expression {
 }
 
 func (p *Parser) parsePrefixExpression() ast.Expression {
-	defer untrace(trace("parsePrefixExpression"))
+	if config.Debug != nil && *config.Debug {
+		defer untrace(trace("parsePrefixExpression"))
+	}
 	prefixExp := &ast.PrefixExpression{
 		Token:    p.currToken,
 		Operator: p.currToken.Literal,
@@ -231,7 +242,9 @@ func (p *Parser) parsePrefixExpression() ast.Expression {
 }
 
 func (p *Parser) parseInfixExpression(left ast.Expression) ast.Expression {
-	defer untrace(trace("parseInfixExpression"))
+	if config.Debug != nil && *config.Debug {
+		defer untrace(trace("parseInfixExpression"))
+	}
 	exp := &ast.InfixExpression{
 		Token:    p.currToken,
 		Left:     left,
@@ -244,6 +257,14 @@ func (p *Parser) parseInfixExpression(left ast.Expression) ast.Expression {
 
 	return exp
 }
+
+func (p *Parser) parseBoolean() ast.Expression {
+	return &ast.BooleanLiteral{
+		Token: p.currToken,
+		Value: p.currTokenIs(token.TRUE),
+	}
+}
+
 func (p *Parser) registerPrefix(tokenType token.TokenType, fn prefixParseFn) {
 	p.prefixParseFns[tokenType] = fn
 }

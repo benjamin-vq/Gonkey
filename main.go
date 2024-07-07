@@ -1,13 +1,18 @@
 package main
 
 import (
+	"flag"
 	"fmt"
+	"github.com/benja-vq/gonkey/config"
 	"github.com/benja-vq/gonkey/repl"
 	"os"
 	"os/user"
 )
 
 func main() {
+	config.Debug = flag.Bool("debug", false, "Prints debugging information during interpreter execution")
+	flag.Parse()
+
 	usr, err := user.Current()
 
 	if err != nil {
