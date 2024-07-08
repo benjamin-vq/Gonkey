@@ -55,13 +55,15 @@ func NewParser(l *lexer.Lexer) *Parser {
 		errors: []string{},
 	}
 
-	parser.prefixParseFns = make(map[token.TokenType]prefixParseFn, 6)
+	parser.prefixParseFns = make(map[token.TokenType]prefixParseFn, 8)
 	parser.registerPrefix(token.IDENT, parser.parseIdentifier)
 	parser.registerPrefix(token.INT, parser.parseIntegerLiteral)
 	parser.registerPrefix(token.BANG, parser.parsePrefixExpression)
 	parser.registerPrefix(token.MINUS, parser.parsePrefixExpression)
 	parser.registerPrefix(token.TRUE, parser.parseBoolean)
 	parser.registerPrefix(token.FALSE, parser.parseBoolean)
+	parser.registerPrefix(token.LPAREN, parser.parseGroupedExpression)
+	parser.registerPrefix(token.IF, parser.parseIfExpression)
 
 	parser.infixParseFns = make(map[token.TokenType]infixParseFn, 8)
 	parser.registerInfix(token.PLUS, parser.parseInfixExpression)
@@ -263,6 +265,68 @@ func (p *Parser) parseBoolean() ast.Expression {
 		Token: p.currToken,
 		Value: p.currTokenIs(token.TRUE),
 	}
+}
+
+func (p *Parser) parseGroupedExpression() ast.Expression {
+	p.nextToken()
+
+	exp := p.parseExpression(LOWEST)
+
+	if !p.expectPeek(token.RPAREN) {
+		return nil
+	}
+
+	return exp
+}
+
+func (p *Parser) parseIfExpression() ast.Expression {
+	expression := &ast.IfExpression{Token: p.currToken}
+
+	if !p.expectPeek(token.LPAREN) {
+		return nil
+	}
+
+	p.nextToken()
+	expression.Condition = p.parseExpression(LOWEST)
+
+	if !p.expectPeek(token.RPAREN) {
+		return nil
+	}
+
+	if !p.expectPeek(token.LBRACE) {
+		return nil
+	}
+
+	expression.Consequence = p.parseBlockStatement()
+
+	if p.peekTokenIs(token.ELSE) {
+		p.nextToken()
+
+		if !p.expectPeek(token.LBRACE) {
+			return nil
+		}
+
+		expression.Alternative = p.parseBlockStatement()
+	}
+
+	return expression
+}
+
+func (p *Parser) parseBlockStatement() *ast.BlockStatement {
+	block := &ast.BlockStatement{Token: p.currToken}
+	block.Statements = []ast.Statement{}
+
+	p.nextToken()
+
+	for !p.currTokenIs(token.RBRACE) && !p.currTokenIs(token.EOF) {
+		stmt := p.parseStatement()
+		if stmt != nil {
+			block.Statements = append(block.Statements, stmt)
+		}
+		p.nextToken()
+	}
+
+	return block
 }
 
 func (p *Parser) registerPrefix(tokenType token.TokenType, fn prefixParseFn) {
