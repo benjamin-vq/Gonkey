@@ -88,6 +88,8 @@ func (tt TokenType) Literal() (lit string) {
 		lit = "ELSE"
 	case 26:
 		lit = "RETURN"
+	case 27:
+		lit = "STRING"
 	}
 	return lit
 }
@@ -128,4 +130,6 @@ const (
 	IF
 	ELSE
 	RETURN
+
+	STRING
 )

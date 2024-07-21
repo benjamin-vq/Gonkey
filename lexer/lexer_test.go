@@ -25,6 +25,8 @@ if (5 < 10) {
 
 10 == 10;
 10 != 9;
+"foobar"
+"foo bar"
 `
 
 	cases := []struct {
@@ -104,6 +106,8 @@ if (5 < 10) {
 		{expectedType: token.NOT_EQ, expectedLiteral: "!="},
 		{expectedType: token.INT, expectedLiteral: "9"},
 		{expectedType: token.SEMICOLON, expectedLiteral: ";"},
+		{expectedType: token.STRING, expectedLiteral: "foobar"},
+		{expectedType: token.STRING, expectedLiteral: "foo bar"},
 		{expectedType: token.EOF, expectedLiteral: ""},
 	}
 
