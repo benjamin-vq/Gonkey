@@ -27,6 +27,7 @@ if (5 < 10) {
 10 != 9;
 "foobar"
 "foo bar"
+[1, 2];
 `
 
 	cases := []struct {
@@ -108,12 +109,18 @@ if (5 < 10) {
 		{expectedType: token.SEMICOLON, expectedLiteral: ";"},
 		{expectedType: token.STRING, expectedLiteral: "foobar"},
 		{expectedType: token.STRING, expectedLiteral: "foo bar"},
+		{expectedType: token.LBRACKET, expectedLiteral: "["},
+		{expectedType: token.INT, expectedLiteral: "1"},
+		{expectedType: token.COMMA, expectedLiteral: ","},
+		{expectedType: token.INT, expectedLiteral: "2"},
+		{expectedType: token.RBRACKET, expectedLiteral: "]"},
+		{expectedType: token.SEMICOLON, expectedLiteral: ";"},
 		{expectedType: token.EOF, expectedLiteral: ""},
 	}
 
 	lexer := NewLexer(input)
 
-	read := []string{}
+	read := make([]string, 0, len(cases))
 	for i, tt := range cases {
 		tok := lexer.NextToken()
 

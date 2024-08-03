@@ -90,6 +90,10 @@ func (tt TokenType) Literal() (lit string) {
 		lit = "RETURN"
 	case 27:
 		lit = "STRING"
+	case 28:
+		lit = "["
+	case 29:
+		lit = "]"
 	}
 	return lit
 }
@@ -132,4 +136,6 @@ const (
 	RETURN
 
 	STRING
+	LBRACKET
+	RBRACKET
 )

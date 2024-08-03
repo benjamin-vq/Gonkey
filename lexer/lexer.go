@@ -66,6 +66,10 @@ func (l *Lexer) NextToken() (tok token.Token) {
 		}
 	case 62:
 		tok = newToken(token.GT)
+	case 91:
+		tok = newToken(token.LBRACKET)
+	case 93:
+		tok = newToken(token.RBRACKET)
 	case 123:
 		tok = newToken(token.LBRACE)
 	case 125:
