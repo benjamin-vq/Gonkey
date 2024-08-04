@@ -114,7 +114,7 @@ type Error struct {
 func (e *Error) Type() ObjectType { return ERROR_OBJ }
 
 // TODO: Incorporate line and column numbers in the lexer to give better error messages
-func (e *Error) Inspect() string { return "ERORR: " + e.Message }
+func (e *Error) Inspect() string { return "ERROR: " + e.Message }
 
 type Null struct{}
 

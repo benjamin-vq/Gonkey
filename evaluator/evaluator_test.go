@@ -349,30 +349,70 @@ func TestBuiltinFunctions(t *testing.T) {
 		{`len("hello world")`, 11},
 		{`len(1)`, "argument to 'len' not supported, got INTEGER"},
 		{`len("one", "two")`, "wrong number of arguments, got 2 want 1"},
+		{`len([1, 2, 3])`, 3},
+		{`len([])`, 0},
+		{`first([1, 2, 3])`, 1},
+		{`first([27])`, 27},
+		{`first([])`, nil},
+		{`first(1)`, "argument to 'first' must be ARRAY, got INTEGER"},
+		{`first("32")`, "argument to 'first' must be ARRAY, got STRING"},
+		{"first()", "wrong number of arguments, got 0 want 1"},
+		{"first([1, 2], 2)", "wrong number of arguments, got 2 want 1"},
+		{`last([1, 2, 3])`, 3},
+		{`last([27])`, 27},
+		{`last([])`, nil},
+		{`last(1)`, "argument to 'last' must be ARRAY, got INTEGER"},
+		{`last("32")`, "argument to 'last' must be ARRAY, got STRING"},
+		{"last()", "wrong number of arguments, got 0 want 1"},
+		{"last([1, 2], 2)", "wrong number of arguments, got 2 want 1"},
+		{`rest([1, 2, 3])`, []int{2, 3}},
+		{`rest([])`, nil},
+		{`rest(1)`, "argument to 'rest' must be ARRAY, got INTEGER"},
+		{`rest()`, "wrong number of arguments, got 0 want 1"},
+		{`push([], 1)`, []int{1}},
+		{`push([3], 5)`, []int{3, 5}},
+		{`push(1, 1)`, "argument to 'push' must be ARRAY, got INTEGER"},
+		{`push()`, "wrong number of arguments, got 0 want 2"},
 	}
 
-	for _, c := range cases {
-		eval := testEval(c.input)
+	for i, c := range cases {
+		t.Run(fmt.Sprintf("Builtin Functions Test Case %d", i), func(t *testing.T) {
+			evaluated := testEval(c.input)
 
-		switch expected := c.expected.(type) {
-		case int:
-			testIntegerObject(t, eval, int64(expected))
-		case string:
-			err, ok := eval.(*object.Error)
-			if !ok {
-				t.Errorf("Object is not an error object, got %T (%+v)",
-					err, err)
-				continue
+			switch expected := c.expected.(type) {
+			case int:
+				testIntegerObject(t, evaluated, int64(expected))
+			case nil:
+				testNullObject(t, evaluated)
+			case string:
+				errObj, ok := evaluated.(*object.Error)
+				if !ok {
+					t.Errorf("object is not an error object, got %T (%+v)",
+						evaluated, evaluated)
+					return
+				}
+				if errObj.Message != expected {
+					t.Errorf("Incorrect error message, got %q want %q",
+						errObj.Message, expected)
+				}
+			case []int:
+				array, ok := evaluated.(*object.Array)
+				if !ok {
+					t.Errorf("object is not an array object, got %T (%+v)", evaluated, evaluated)
+					return
+				}
+
+				if len(array.Elements) != len(expected) {
+					t.Errorf("Incorrect amount of elements, got %d want %d",
+						len(array.Elements), len(expected))
+					return
+				}
+
+				for j, expectedElem := range expected {
+					testIntegerObject(t, array.Elements[j], int64(expectedElem))
+				}
 			}
-
-			if err.Message != c.expected {
-				t.Errorf(`Incorrect error message. 
-Got: %q 
-Want: %q`,
-					err.Message, c.expected)
-			}
-
-		}
+		})
 	}
 }
 
