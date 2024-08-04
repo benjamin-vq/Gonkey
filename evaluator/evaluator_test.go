@@ -376,6 +376,56 @@ Want: %q`,
 	}
 }
 
+func TestArrayLiterals(t *testing.T) {
+	input := "[1, 2 * 2, 3 + 3]"
+
+	evaluated := testEval(input)
+	result, ok := evaluated.(*object.Array)
+	if !ok {
+		t.Fatalf("Object is not an array object, got %T (%+v)", evaluated, evaluated)
+	}
+
+	if len(result.Elements) != 3 {
+		t.Fatalf("Incorrect amount of elements in array, got %d want %d",
+			result.Elements, 3)
+	}
+
+	testIntegerObject(t, result.Elements[0], 1)
+	testIntegerObject(t, result.Elements[1], 4)
+	testIntegerObject(t, result.Elements[2], 6)
+
+}
+
+func TestArrayIndexExpressions(t *testing.T) {
+	cases := []struct {
+		input    string
+		expected any
+	}{
+		{"[1, 2, 3][0]", 1},
+		{"[1, 2, 3][1]", 2},
+		{"[1, 2, 3][2]", 3},
+		{"let i = 0; [1][i];", 1},
+		{"[1, 2, 3][1 + 1];", 3},
+		{"let myArray = [1, 2, 3]; myArray[2]", 3},
+		{"let myArray = [1, 2, 3]; myArray[0] + myArray[1] + myArray[2];", 6},
+		{"let myArray = [1, 2 ,3]; let i = myArray[0]; myArray[i]", 2},
+		{"[1, 2, 3][3]", nil},
+		{"[1, 2, 3][-1]", nil},
+	}
+
+	for i, c := range cases {
+		t.Run(fmt.Sprintf("Array Index Expression Test Case %d", i), func(t *testing.T) {
+			evaluated := testEval(c.input)
+			integer, ok := c.expected.(int)
+			if ok {
+				testIntegerObject(t, evaluated, int64(integer))
+			} else {
+				testNullObject(t, evaluated)
+			}
+		})
+	}
+}
+
 func testEval(input string) object.Object {
 	l := lexer.NewLexer(input)
 	p := parser.NewParser(l)
