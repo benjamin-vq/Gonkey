@@ -6,7 +6,7 @@ type Lexer struct {
 	input        string
 	position     int  // Current position in input
 	readPosition int  // Current reading position in input
-	char         byte // Character under examination. TODO: Support UTF-8
+	char         byte // Character under examination.
 }
 
 func NewLexer(input string) *Lexer {
@@ -53,6 +53,8 @@ func (l *Lexer) NextToken() (tok token.Token) {
 		tok = newToken(token.MINUS)
 	case 47:
 		tok = newToken(token.SLASH)
+	case 58:
+		tok = newToken(token.COLON)
 	case 59:
 		tok = newToken(token.SEMICOLON)
 	case 60:

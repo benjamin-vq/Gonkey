@@ -28,6 +28,7 @@ if (5 < 10) {
 "foobar"
 "foo bar"
 [1, 2];
+{"foo": "bar"}
 `
 
 	cases := []struct {
@@ -115,6 +116,11 @@ if (5 < 10) {
 		{expectedType: token.INT, expectedLiteral: "2"},
 		{expectedType: token.RBRACKET, expectedLiteral: "]"},
 		{expectedType: token.SEMICOLON, expectedLiteral: ";"},
+		{expectedType: token.LBRACE, expectedLiteral: "{"},
+		{expectedType: token.STRING, expectedLiteral: "foo"},
+		{expectedType: token.COLON, expectedLiteral: ":"},
+		{expectedType: token.STRING, expectedLiteral: "bar"},
+		{expectedType: token.RBRACE, expectedLiteral: "}"},
 		{expectedType: token.EOF, expectedLiteral: ""},
 	}
 
