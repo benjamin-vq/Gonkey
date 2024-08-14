@@ -211,6 +211,10 @@ if (10 > 1) {
 			`"Hello" - "World"`,
 			"unknown operator: STRING - STRING",
 		},
+		{
+			`{"name": "Monkey"}[fn(x) { x }];`,
+			"FUNCTION is not usable as a hash key",
+		},
 	}
 
 	for i, c := range cases {
@@ -506,6 +510,33 @@ func TestHashLiterals(t *testing.T) {
 		}
 
 		testIntegerObject(t, pair.Value, expectedValue)
+	}
+}
+
+func TestHashIndexExpressions(t *testing.T) {
+	cases := []struct {
+		input    string
+		expected any
+	}{
+		{`{"foo": 5}["foo"]`, 5},
+		{`{"foo": 5}["bar"]`, nil},
+		{`let key = "foo"; {"foo": 5}[key]`, 5},
+		{`{}["foo"]`, nil},
+		{`{5: 5}[5]`, 5},
+		{`{true: 5}[true]`, 5},
+		{`{false: 5}[false]`, 5},
+	}
+
+	for i, c := range cases {
+		t.Run(fmt.Sprintf("Hash Index Expression Test Case %d", i), func(t *testing.T) {
+			evaluated := testEval(c.input)
+			integer, ok := c.expected.(int)
+			if ok {
+				testIntegerObject(t, evaluated, int64(integer))
+			} else {
+				testNullObject(t, evaluated)
+			}
+		})
 	}
 }
 
