@@ -42,14 +42,20 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		body := node.Body
 		return &object.Function{Parameters: params, Body: body, Env: env}
 	case *ast.CallExpression:
+		if node.Function.TokenLiteral() == "quote" {
+			return quote(node.Arguments[0])
+		}
+
 		function := Eval(node.Function, env)
 		if isError(function) {
 			return function
 		}
+
 		args := evalExpressions(node.Arguments, env)
 		if len(args) == 1 && isError(args[0]) {
 			return args[0]
 		}
+
 		return applyFunction(function, args)
 	case *ast.IntegerLiteral:
 		return &object.Integer{Value: node.Value}
@@ -368,6 +374,10 @@ func evalHashIndexExpression(hash, index object.Object) object.Object {
 	}
 
 	return pair.Value
+}
+
+func quote(node ast.Node) object.Object {
+	return &object.Quote{Node: node}
 }
 
 func isTruthy(obj object.Object) bool {
